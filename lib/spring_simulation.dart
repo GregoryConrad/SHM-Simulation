@@ -90,7 +90,8 @@ class _SpringWidgetState extends State<SpringWidget>
       Column(children: [
         Expanded(child: Container()),
         Text('Oscillating at ${frequency.format()} Hz '
-            'with a period of ${period.format()} s'),
+            'with a period of ${period.format()} s '
+            'and a total energy of ${totalEnergy.format()} J'),
         Card(
           margin: EdgeInsets.all(8),
           child: Padding(

@@ -12,7 +12,7 @@ class _SpringWidgetState extends State<SpringWidget>
     with SingleTickerProviderStateMixin {
   AnimationController _controller;
 
-  int springConstant = 1, mass = 1, amplitude = 100;
+  double springConstant = 1, mass = 1, amplitude = 1;
 
   double get angularFrequency => sqrt(springConstant / mass);
 
@@ -21,7 +21,7 @@ class _SpringWidgetState extends State<SpringWidget>
   double get period => 1 / frequency;
 
   double get displacement =>
-      amplitude * cos(angularFrequency * _controller.value * period);
+      100 * amplitude * cos(angularFrequency * _controller.value * period);
 
   // Use pow with third root as that is the relationship between
   //   mass and one side length of the cube
@@ -43,76 +43,84 @@ class _SpringWidgetState extends State<SpringWidget>
   void _resetAnimation() {
     // For .repeat, Duration only allows int params so use a smaller size
     //  to keep precision
-    _controller.repeat(period: Duration(milliseconds: (period * 1000).toInt()));
+    _controller.repeat(
+      period: Duration(microseconds: (period * 1000000).toInt()),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(children: [
+    return Stack(alignment: Alignment.topCenter, children: [
       // todo equations
-      Expanded(
-        child: AnimatedBuilder(
+      LayoutBuilder(builder: (context, size) {
+        return AnimatedBuilder(
           animation: _controller,
           child: Container(
             width: cubeLength,
             height: cubeLength,
             color: Colors.green,
-            child: Center(child: Text('$mass kg')),
+            child: Center(child: Text('${mass.round()} kg')),
           ),
-          builder: (context, child) => Column(children: [
-            Container(
-              height: MediaQuery.of(context).size.height / 2 -
-                  cubeLength / 2 +
-                  displacement,
-              width: max(3, springConstant / 4),
-              color: Colors.white,
+          builder: (context, child) =>
+              Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Container(width: 150),
+            Expanded(
+              child: Column(children: [
+                Container(
+                  height: size.maxHeight / 2 - cubeLength / 2 + displacement,
+                  width: max(3, springConstant / 4),
+                  color: Colors.white,
+                ),
+                child,
+              ]),
             ),
-            child,
+            Container(
+              width: 150,
+              height: size.maxHeight / 2,
+              color: Colors.grey,
+            ),
           ]),
+        );
+      }),
+      Column(children: [
+        Expanded(child: Container()),
+        Text('Oscillating at ${frequency.format()} Hz '
+            'with a period of ${period.format()} s'),
+        Card(
+          margin: EdgeInsets.all(8),
+          child: Padding(
+            padding: EdgeInsets.only(left: 16),
+            child: Column(children: [
+              _createSliderValue('Spring Constant (\$ N/m)', springConstant, 1,
+                  150, (v) => springConstant = v),
+              _createSliderValue('Mass (\$ kg)', mass, 1, 100, (v) => mass = v),
+              _createSliderValue(
+                  'Amplitude (\$ m)', amplitude, 0.25, 2, (v) => amplitude = v),
+            ]),
+          ),
         ),
+      ]),
+    ]);
+  }
+
+  Widget _createSliderValue(String label, double value, double min, double max,
+      Function(double) onChanged) {
+    return Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+      Container(
+        width: 200,
+        child: Text(label.replaceAll(r'$', value.format())),
       ),
-      Text('Oscillating at ${frequency.format()} Hz '
-          'with a period of ${period.format()} s'),
-      Card(
-        margin: EdgeInsets.all(8),
-        child: Padding(
-          padding: EdgeInsets.only(left: 16),
-          child: Column(children: [
-            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-              Container(
-                width: 200,
-                child: Text('Spring Constant ($springConstant N/m)'),
-              ),
-              Expanded(
-                child: Slider(
-                  value: springConstant.toDouble(),
-                  min: 1,
-                  max: 100,
-                  onChanged: (k) => setState(() {
-                    springConstant = k.round();
-                    _resetAnimation();
-                  }),
-                ),
-              ),
-            ]),
-            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-              Container(
-                width: 200,
-                child: Text('Mass ($mass kg)'),
-              ),
-              Expanded(
-                child: Slider(
-                  value: mass.toDouble(),
-                  min: 1,
-                  max: 100,
-                  onChanged: (m) => setState(() {
-                    mass = m.round();
-                    _resetAnimation();
-                  }),
-                ),
-              ),
-            ]),
-          ]),
+      Expanded(
+        child: Slider(
+          value: value,
+          min: min,
+          max: max,
+          onChanged: (v) {
+            setState(() {
+              onChanged(v);
+              _resetAnimation();
+            });
+          },
         ),
       ),
     ]);

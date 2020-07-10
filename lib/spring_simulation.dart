@@ -21,7 +21,13 @@ class _SpringWidgetState extends State<SpringWidget>
   double get period => 1 / frequency;
 
   double get displacement =>
-      100 * amplitude * cos(angularFrequency * _controller.value * period);
+      amplitude * cos(angularFrequency * _controller.value * period);
+
+  double get totalEnergy => 0.5 * springConstant * pow(amplitude, 2);
+
+  double get potentialEnergy => 0.5 * springConstant * pow(displacement, 2);
+
+  double get kineticEnergy => totalEnergy - potentialEnergy;
 
   // Use pow with third root as that is the relationship between
   //   mass and one side length of the cube
@@ -63,22 +69,21 @@ class _SpringWidgetState extends State<SpringWidget>
           ),
           builder: (context, child) =>
               Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Container(width: 150),
+            _createEnergyBar(
+                'Kinetic Energy\n(\$ J)', kineticEnergy, size.maxHeight),
             Expanded(
               child: Column(children: [
                 Container(
-                  height: size.maxHeight / 2 - cubeLength / 2 + displacement,
+                  height:
+                      size.maxHeight / 2 - cubeLength / 2 + 100 * displacement,
                   width: max(3, springConstant / 4),
                   color: Colors.white,
                 ),
                 child,
               ]),
             ),
-            Container(
-              width: 150,
-              height: size.maxHeight / 2,
-              color: Colors.grey,
-            ),
+            _createEnergyBar(
+                'Potential Energy\n(\$ J)', potentialEnergy, size.maxHeight),
           ]),
         );
       }),
@@ -103,6 +108,8 @@ class _SpringWidgetState extends State<SpringWidget>
     ]);
   }
 
+  /// Creates a Slider widget with a label. The $ character is replaced with an
+  ///  appropriate user facing value
   Widget _createSliderValue(String label, double value, double min, double max,
       Function(double) onChanged) {
     return Row(mainAxisAlignment: MainAxisAlignment.center, children: [
@@ -124,5 +131,24 @@ class _SpringWidgetState extends State<SpringWidget>
         ),
       ),
     ]);
+  }
+
+  Widget _createEnergyBar(String label, double energy, double maxHeight) {
+    return Container(
+      width: 128,
+      child: Column(children: [
+        SizedBox(height: 4),
+        Text(
+          label.replaceAll(r'$', energy.format()),
+          textAlign: TextAlign.center,
+        ),
+        SizedBox(height: 4),
+        Container(
+          width: 50,
+          height: maxHeight / 2 * energy / totalEnergy,
+          color: Colors.grey,
+        ),
+      ]),
+    );
   }
 }

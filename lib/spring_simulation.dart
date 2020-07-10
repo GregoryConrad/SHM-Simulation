@@ -10,9 +10,7 @@ class SpringWidget extends StatefulWidget {
 
 class _SpringWidgetState extends State<SpringWidget>
     with SingleTickerProviderStateMixin {
-  // Animation is used to get a rebuild every frame
   AnimationController _controller;
-  Stopwatch _stopwatch = Stopwatch();
 
   int springConstant = 1, mass = 1, amplitude = 100;
 
@@ -23,7 +21,7 @@ class _SpringWidgetState extends State<SpringWidget>
   double get period => 1 / frequency;
 
   double get displacement =>
-      amplitude * cos(angularFrequency * _stopwatch.elapsedMilliseconds / 1000);
+      amplitude * cos(angularFrequency * _controller.value * period);
 
   // Use pow with third root as that is the relationship between
   //   mass and one side length of the cube
@@ -32,16 +30,20 @@ class _SpringWidgetState extends State<SpringWidget>
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(vsync: this)
-      ..repeat(period: Duration(seconds: 1));
-    _stopwatch.start();
+    _controller = AnimationController(vsync: this);
+    _resetAnimation();
   }
 
   @override
   void dispose() {
     _controller.dispose();
-    _stopwatch.stop();
     super.dispose();
+  }
+
+  void _resetAnimation() {
+    // For .repeat, Duration only allows int params so use a smaller size
+    //  to keep precision
+    _controller.repeat(period: Duration(milliseconds: (period * 1000).toInt()));
   }
 
   @override
@@ -88,7 +90,7 @@ class _SpringWidgetState extends State<SpringWidget>
                   max: 100,
                   onChanged: (k) => setState(() {
                     springConstant = k.round();
-                    _stopwatch.reset();
+                    _resetAnimation();
                   }),
                 ),
               ),
@@ -105,7 +107,7 @@ class _SpringWidgetState extends State<SpringWidget>
                   max: 100,
                   onChanged: (m) => setState(() {
                     mass = m.round();
-                    _stopwatch.reset();
+                    _resetAnimation();
                   }),
                 ),
               ),

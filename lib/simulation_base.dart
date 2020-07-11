@@ -1,12 +1,16 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:ph1140_project/format.dart';
+import 'package:ph1140_project/main.dart';
 export 'package:ph1140_project/format.dart';
 
 abstract class SimulationBaseState<T extends StatefulWidget> extends State<T>
     with SingleTickerProviderStateMixin {
   AnimationController controller;
+
+  StreamSubscription<bool> _subscription;
 
   double get period;
 
@@ -19,26 +23,29 @@ abstract class SimulationBaseState<T extends StatefulWidget> extends State<T>
   double get cubeLength => 50 + 5 * pow(mass, 1 / 3);
 
   void resetAnimation() {
-    // For .repeat, Duration only allows int params so use a smaller size
-    //  to keep precision
-    controller.repeat(
-      period: Duration(microseconds: (period * 1000000).toInt()),
-    );
+    if (stateStream.value) {
+      // For .repeat, Duration only allows int params so use a smaller size
+      //  to keep precision
+      controller.repeat(
+        period: Duration(microseconds: (period * 1000000).toInt()),
+      );
+    } else {
+      controller.stop();
+    }
   }
 
   @override
   void initState() {
     super.initState();
     controller = AnimationController(vsync: this);
-    resetAnimation();
+    // BehaviorSubject emits last value for new subscribers, so this
+    //  will be called automatically for us
+    _subscription = stateStream.listen((_) => resetAnimation());
   }
-
-  // todo listen to stateStream in init state and close in dispose.
-  //  also make sure to listen to initial value to determine what to do to start
-  //  change controller accordingly
 
   @override
   void dispose() {
+    _subscription.cancel();
     controller.dispose();
     super.dispose();
   }

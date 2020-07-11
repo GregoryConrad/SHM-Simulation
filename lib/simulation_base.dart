@@ -10,7 +10,7 @@ abstract class SimulationBaseState<T extends StatefulWidget> extends State<T>
     with SingleTickerProviderStateMixin {
   AnimationController controller;
 
-  StreamSubscription<bool> _subscription;
+  StreamSubscription<ApplicationState> _subscription;
 
   double get period;
 
@@ -23,11 +23,12 @@ abstract class SimulationBaseState<T extends StatefulWidget> extends State<T>
   double get cubeLength => 50 + 5 * pow(mass, 1 / 3);
 
   void resetAnimation() {
-    if (stateStream.value) {
+    final state = stateStream.value;
+    if (state.isPlaying) {
       // For .repeat, Duration only allows int params so use a smaller size
       //  to keep precision
       controller.repeat(
-        period: Duration(microseconds: (period * 1000000).toInt()),
+        period: Duration(microseconds: period * 1000000 ~/ state.speed),
       );
     } else {
       controller.stop();

@@ -3,7 +3,28 @@ import 'package:ph1140_project/simple_pendulum_simulation.dart';
 import 'package:ph1140_project/spring_simulation.dart';
 import 'package:rxdart/rxdart.dart';
 
-final stateStream = BehaviorSubject.seeded(true);
+class ApplicationState {
+  final bool isPlaying;
+  final double speed;
+
+  ApplicationState.initial()
+      : isPlaying = true,
+        speed = 1;
+
+  ApplicationState._from(this.isPlaying, this.speed);
+
+  ApplicationState copyWithPlaying() => ApplicationState._from(true, speed);
+
+  ApplicationState copyWithPaused() => ApplicationState._from(false, speed);
+
+  ApplicationState copyWithIncreasedSpeed() =>
+      speed >= 2.00 ? this : ApplicationState._from(isPlaying, speed + 0.05);
+
+  ApplicationState copyWithDecreasedSpeed() =>
+      speed <= 0.05 ? this : ApplicationState._from(isPlaying, speed - 0.05);
+}
+
+final stateStream = BehaviorSubject.seeded(ApplicationState.initial());
 
 void main() {
   runApp(MaterialApp(
@@ -13,25 +34,42 @@ void main() {
       brightness: Brightness.dark,
       visualDensity: VisualDensity.adaptivePlatformDensity,
     ),
-    home: StreamBuilder<bool>(
+    home: StreamBuilder<ApplicationState>(
         initialData: stateStream.value,
         stream: stateStream,
         builder: (context, snapshot) {
-          final isLarge = MediaQuery.of(context).size.width > 800;
+          final state = snapshot.data;
+          final width = MediaQuery.of(context).size.width;
+          final isLarge = width > 800;
           return DefaultTabController(
             length: 2,
             child: Scaffold(
               appBar: AppBar(
-                title: Text('Simple Harmonic Oscillators'),
+                title: Text(
+                  width > 600 ? 'Simple Harmonic Oscillators' : 'Oscillators',
+                ),
                 actions: [
-                  if (snapshot.data)
+                  FlatButton(
+                    child: Text('-'),
+                    onPressed: () =>
+                        stateStream.add(state.copyWithDecreasedSpeed()),
+                  ),
+                  Center(child: Text('Speed: ${(state.speed * 100).round()}%')),
+                  FlatButton(
+                    child: Text('+'),
+                    onPressed: () =>
+                        stateStream.add(state.copyWithIncreasedSpeed()),
+                  ),
+                  if (state.isPlaying)
                     IconButton(
-                        icon: Icon(Icons.pause),
-                        onPressed: () => stateStream.add(false))
+                      icon: Icon(Icons.pause),
+                      onPressed: () => stateStream.add(state.copyWithPaused()),
+                    )
                   else
                     IconButton(
-                        icon: Icon(Icons.play_arrow),
-                        onPressed: () => stateStream.add(true))
+                      icon: Icon(Icons.play_arrow),
+                      onPressed: () => stateStream.add(state.copyWithPlaying()),
+                    )
                 ],
                 bottom: isLarge
                     ? null

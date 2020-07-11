@@ -26,10 +26,6 @@ class _SpringWidgetState extends SimulationBaseState<SpringWidget> {
 
   double get kineticEnergy => totalEnergy - potentialEnergy;
 
-  // Use pow with third root as that is the relationship between
-  //   mass and one side length of the cube
-  double get cubeLength => 50 + 5 * pow(mass, 1 / 3);
-
   @override
   Widget build(BuildContext context) {
     return Stack(alignment: Alignment.topCenter, children: [
@@ -44,8 +40,7 @@ class _SpringWidgetState extends SimulationBaseState<SpringWidget> {
           ),
           builder: (context, child) =>
               Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            _createEnergyBar(
-                'Kinetic Energy\n(\$ J)', kineticEnergy, size.maxHeight),
+            createEnergyBar('Kinetic Energy\n(\$ J)', kineticEnergy),
             Expanded(
               child: Column(children: [
                 Container(
@@ -57,8 +52,7 @@ class _SpringWidgetState extends SimulationBaseState<SpringWidget> {
                 child,
               ]),
             ),
-            _createEnergyBar(
-                'Potential Energy\n(\$ J)', potentialEnergy, size.maxHeight),
+            createEnergyBar('Potential Energy\n(\$ J)', potentialEnergy),
           ]),
         );
       }),
@@ -82,24 +76,5 @@ class _SpringWidgetState extends SimulationBaseState<SpringWidget> {
         ),
       ]),
     ]);
-  }
-
-  Widget _createEnergyBar(String label, double energy, double maxHeight) {
-    return Container(
-      width: 128,
-      child: Column(children: [
-        SizedBox(height: 4),
-        Text(
-          label.replaceAll(r'$', energy.format()),
-          textAlign: TextAlign.center,
-        ),
-        SizedBox(height: 4),
-        Container(
-          width: 50,
-          height: maxHeight / 2 * energy / totalEnergy,
-          color: Colors.grey,
-        ),
-      ]),
-    );
   }
 }

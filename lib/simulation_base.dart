@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:ph1140_project/format.dart';
 export 'package:ph1140_project/format.dart';
@@ -7,6 +9,14 @@ abstract class SimulationBaseState<T extends StatefulWidget> extends State<T>
   AnimationController controller;
 
   double get period;
+
+  double get mass;
+
+  double get totalEnergy;
+
+  // Use pow with third root as that is the relationship between
+  //   mass and one side length of the cube
+  double get cubeLength => 50 + 5 * pow(mass, 1 / 3);
 
   void resetAnimation() {
     // For .repeat, Duration only allows int params so use a smaller size
@@ -52,5 +62,24 @@ abstract class SimulationBaseState<T extends StatefulWidget> extends State<T>
         ),
       ),
     ]);
+  }
+
+  Widget createEnergyBar(String label, double energy) {
+    return Container(
+      width: 128,
+      child: Column(children: [
+        SizedBox(height: 4),
+        Text(
+          label.replaceAll(r'$', energy.format()),
+          textAlign: TextAlign.center,
+        ),
+        SizedBox(height: 4),
+        Container(
+          width: 50,
+          height: MediaQuery.of(context).size.height / 2 * energy / totalEnergy,
+          color: Colors.grey,
+        ),
+      ]),
+    );
   }
 }

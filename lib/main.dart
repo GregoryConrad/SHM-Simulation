@@ -16,7 +16,13 @@ void main() {
         appBar: AppBar(
           title: Text('Simple Harmonic Oscillators'),
         ),
-        body: isLarge ? SimplePendulumWidget() : SpringWidget(),
+        body: isLarge
+            ? Row(children: [
+                Expanded(child: SpringWidget()),
+                VerticalDivider(thickness: 2),
+                Expanded(child: SimplePendulumWidget()),
+              ])
+            : SpringWidget(),
       );
     }),
   ));

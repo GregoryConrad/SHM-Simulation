@@ -56,7 +56,7 @@ class _SimplePendulumWidgetState
       ),
       Column(children: [
         Expanded(child: Container()),
-        Text('Swinging with a period of ${period.format()} s'
+        Text('Swinging with a period of ${period.format()} s '
             'and a total energy of ${totalEnergy.format()} J'),
         Card(
             margin: const EdgeInsets.all(8),

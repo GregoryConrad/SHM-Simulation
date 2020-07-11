@@ -11,18 +11,27 @@ void main() {
       visualDensity: VisualDensity.adaptivePlatformDensity,
     ),
     home: Builder(builder: (context) {
-      final isLarge = MediaQuery.of(context).size.width > 1000;
-      return Scaffold(
-        appBar: AppBar(
-          title: Text('Simple Harmonic Oscillators'),
+      final isLarge = MediaQuery.of(context).size.width > 800;
+      return DefaultTabController(
+        length: 2,
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text('Simple Harmonic Oscillators'),
+            actions: [
+              // todo pause/start button
+            ],
+            bottom: isLarge
+                ? null
+                : TabBar(tabs: [Tab(text: 'Spring'), Tab(text: 'Pendulum')]),
+          ),
+          body: isLarge
+              ? Row(children: [
+                  Expanded(child: SpringWidget()),
+                  VerticalDivider(thickness: 2),
+                  Expanded(child: SimplePendulumWidget()),
+                ])
+              : TabBarView(children: [SpringWidget(), SimplePendulumWidget()]),
         ),
-        body: isLarge
-            ? Row(children: [
-                Expanded(child: SpringWidget()),
-                VerticalDivider(thickness: 2),
-                Expanded(child: SimplePendulumWidget()),
-              ])
-            : SpringWidget(),
       );
     }),
   ));

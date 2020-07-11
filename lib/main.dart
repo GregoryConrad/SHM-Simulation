@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ph1140_project/simple_pendulum_simulation.dart';
 import 'package:ph1140_project/spring_simulation.dart';
 
 void main() {
@@ -9,11 +10,14 @@ void main() {
       brightness: Brightness.dark,
       visualDensity: VisualDensity.adaptivePlatformDensity,
     ),
-    home: Scaffold(
-      appBar: AppBar(
-        title: Text('Simple Harmonic Oscillators'),
-      ),
-      body: SpringWidget(),
-    ),
+    home: Builder(builder: (context) {
+      final isLarge = MediaQuery.of(context).size.width > 1000;
+      return Scaffold(
+        appBar: AppBar(
+          title: Text('Simple Harmonic Oscillators'),
+        ),
+        body: isLarge ? SimplePendulumWidget() : SpringWidget(),
+      );
+    }),
   ));
 }

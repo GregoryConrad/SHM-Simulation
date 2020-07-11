@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:ph1140_project/format.dart';
 import 'package:ph1140_project/simulation_base.dart';
 
 class SpringWidget extends StatefulWidget {
@@ -69,9 +68,9 @@ class _SpringWidgetState extends SimulationBaseState<SpringWidget> {
             'with a period of ${period.format()} s '
             'and a total energy of ${totalEnergy.format()} J'),
         Card(
-          margin: EdgeInsets.all(8),
+          margin: const EdgeInsets.all(8),
           child: Padding(
-            padding: EdgeInsets.only(left: 16),
+            padding: const EdgeInsets.only(left: 16),
             child: Column(children: [
               createSliderValue('Spring Constant (\$ N/m)', springConstant, 1,
                   150, (v) => springConstant = v),

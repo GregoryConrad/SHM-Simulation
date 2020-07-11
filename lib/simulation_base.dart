@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ph1140_project/format.dart';
+export 'package:ph1140_project/format.dart';
 
 abstract class SimulationBaseState<T extends StatefulWidget> extends State<T>
     with SingleTickerProviderStateMixin {

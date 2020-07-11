@@ -33,6 +33,10 @@ abstract class SimulationBaseState<T extends StatefulWidget> extends State<T>
     resetAnimation();
   }
 
+  // todo listen to stateStream in init state and close in dispose.
+  //  also make sure to listen to initial value to determine what to do to start
+  //  change controller accordingly
+
   @override
   void dispose() {
     controller.dispose();

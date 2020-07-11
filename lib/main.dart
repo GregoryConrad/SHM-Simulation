@@ -14,6 +14,7 @@ void main() {
       visualDensity: VisualDensity.adaptivePlatformDensity,
     ),
     home: StreamBuilder<bool>(
+        initialData: stateStream.value,
         stream: stateStream,
         builder: (context, snapshot) {
           final isLarge = MediaQuery.of(context).size.width > 800;
